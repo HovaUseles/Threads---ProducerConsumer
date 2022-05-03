@@ -8,5 +8,6 @@ namespace Threads___ProducerConsumer
 {
     public class Product
     {
+        public object inUse = new object();
     }
 }

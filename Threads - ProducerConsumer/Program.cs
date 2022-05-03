@@ -13,12 +13,28 @@ namespace Threads___ProducerConsumer
         public static Random random = new Random();
         static void Main()
         {
-            Thread producer = new Thread(Producer);
-            Thread consumer = new Thread(Consumer);
 
-            producer.Start();
-            consumer.Start();
+            Console.WriteLine("1. No monitor");
+            Console.WriteLine("2. With monitor");
+            Thread producer;
+            Thread consumer;
+            switch (Console.ReadKey(true).KeyChar)
+            {
+                case '1':
+                    producer = new Thread(Producer);
+                    consumer = new Thread(Consumer);
 
+                    producer.Start();
+                    consumer.Start();
+                    break;
+                case '2':
+                    producer = new Thread(ProducerMonitor);
+                    consumer = new Thread(ConsumerMonitor);
+
+                    producer.Start();
+                    consumer.Start();
+                    break;
+            }
 
             while (keepRunning)
             {
@@ -29,7 +45,7 @@ namespace Threads___ProducerConsumer
             }
 
         }
-
+        #region No Monitor
         static void Producer()
         {
             int count = 0;
@@ -81,5 +97,65 @@ namespace Threads___ProducerConsumer
 
             }
         }
+        #endregion
+
+        #region With Monitor
+        static void ProducerMonitor()
+        {
+            while (keepRunning)
+            {
+                if (Monitor.TryEnter(products))
+                {
+
+                    if (products.Count < 3)
+                    {
+                        products.Enqueue(new Product());
+                        Console.WriteLine("Producer produces, inventory: {0}", products.Count);
+                        Monitor.Exit(products);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Producer waits...");
+                        Monitor.PulseAll(products);
+                        Monitor.Wait(products);
+                    }
+                }
+                Thread.Sleep(100 / 15);
+            }
+        }
+
+
+        static void ConsumerMonitor()
+        {
+            while (keepRunning)
+            {
+                if (Monitor.TryEnter(products))
+                {
+
+                    if (products.Count > 0)
+                    {
+                        while (products.Count > 0)
+                        {
+                            products.Dequeue();
+                            Console.WriteLine("Consumer consumes, inventory: {0}", products.Count);
+                            Thread.Sleep(100 / 15);
+                        }
+                        Monitor.Exit(products);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Consumer waits...");
+                        Monitor.PulseAll(products);
+                        Monitor.Wait(products);
+                    }
+
+                }
+                Thread.Sleep(100 / 15);
+
+
+            }
+        }
+
+        #endregion
     }
 }
