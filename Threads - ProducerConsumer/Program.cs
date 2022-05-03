@@ -45,15 +45,12 @@ namespace Threads___ProducerConsumer
                 {
                     count++;
                     Console.WriteLine("Producer can't produce");
-                    //Thread.Sleep(random.Next(600, 1000));
                 }
 
                 if (count > 3)
                 {
-                    //Thread.Sleep(random.Next(1500, 3000));
                     Thread.Sleep(3000);
                 }
-                //Thread.Sleep(25 + random.Next(50, 200));
                 Thread.Sleep(100 / 15);
             }
         }
@@ -65,24 +62,22 @@ namespace Threads___ProducerConsumer
             {
                 if (products.Count > 0)
                 {
-                    products.Dequeue();
-                    Console.WriteLine("Consumer consumes, inventory: {0}", products.Count);
-                    count = 0;
+                    while (products.Count > 0)
+                    {
+                        products.Dequeue();
+                        Console.WriteLine("Consumer consumes, inventory: {0}", products.Count);
+                        Thread.Sleep(100 / 15);
+                        count = 0;
+                    }
                 }
                 else
                 {
                     count++;
                     Console.WriteLine("Consumer could not consume");
-                    //Thread.Sleep(random.Next(600, 1000));
                 }
 
-                if (count > 3)
-                {
-                    //Thread.Sleep(random.Next(1500, 3000));
-                    Thread.Sleep(3000);
-                }
-                //Thread.Sleep(5 + random.Next(100, 300));
-                Thread.Sleep(100 / 15);
+                Thread.Sleep(2000);
+
 
             }
         }
